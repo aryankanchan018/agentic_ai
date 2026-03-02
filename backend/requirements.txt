@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+ortools
+python-multipart
+python-dotenv
+httpx
+websockets

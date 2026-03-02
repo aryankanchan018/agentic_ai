@@ -1,0 +1,162 @@
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from typing import List
+import sys
+sys.path.append('..')
+
+from database.database import get_db, init_db
+from database.models import Department, Subject, Room, Faculty, Division, TimeSlot
+from agents.orchestrator import AgentOrchestrator
+from pydantic import BaseModel
+
+app = FastAPI(
+    title="University Timetable Management System",
+    description="AI-powered timetable generation using multi-agent system",
+    version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+init_db()
+
+class DepartmentCreate(BaseModel):
+    name: str
+    code: str
+
+class SubjectCreate(BaseModel):
+    name: str
+    code: str
+    hours_per_week: int
+    is_lab: bool
+    department_id: int
+
+class RoomCreate(BaseModel):
+    room_number: str
+    floor: int
+    capacity: int
+    bench_count: int
+    is_lab: bool
+    room_type: str
+
+class FacultyCreate(BaseModel):
+    name: str
+    employee_id: str
+    department_id: int
+
+class DivisionCreate(BaseModel):
+    name: str
+    year: int
+    student_count: int
+    department_id: int
+
+class TimetableRequest(BaseModel):
+    department_ids: List[int]
+
+@app.post("/departments/")
+def create_department(dept: DepartmentCreate, db: Session = Depends(get_db)):
+    db_dept = Department(**dept.dict())
+    db.add(db_dept)
+    db.commit()
+    db.refresh(db_dept)
+    return db_dept
+
+@app.get("/departments/")
+def get_departments(db: Session = Depends(get_db)):
+    return db.query(Department).all()
+
+@app.post("/subjects/")
+def create_subject(subject: SubjectCreate, db: Session = Depends(get_db)):
+    db_subject = Subject(**subject.dict())
+    db.add(db_subject)
+    db.commit()
+    db.refresh(db_subject)
+    return db_subject
+
+@app.get("/subjects/")
+def get_subjects(db: Session = Depends(get_db)):
+    return db.query(Subject).all()
+
+@app.post("/rooms/")
+def create_room(room: RoomCreate, db: Session = Depends(get_db)):
+    db_room = Room(**room.dict())
+    db.add(db_room)
+    db.commit()
+    db.refresh(db_room)
+    return db_room
+
+@app.get("/rooms/")
+def get_rooms(db: Session = Depends(get_db)):
+    return db.query(Room).all()
+
+@app.post("/faculty/")
+def create_faculty(faculty: FacultyCreate, db: Session = Depends(get_db)):
+    db_faculty = Faculty(**faculty.dict())
+    db.add(db_faculty)
+    db.commit()
+    db.refresh(db_faculty)
+    return db_faculty
+
+@app.get("/faculty/")
+def get_faculty(db: Session = Depends(get_db)):
+    return db.query(Faculty).all()
+
+@app.post("/divisions/")
+def create_division(division: DivisionCreate, db: Session = Depends(get_db)):
+    db_division = Division(**division.dict())
+    db.add(db_division)
+    db.commit()
+    db.refresh(db_division)
+    return db_division
+
+@app.get("/divisions/")
+def get_divisions(db: Session = Depends(get_db)):
+    return db.query(Division).all()
+
+@app.post("/generate-timetable/")
+def generate_timetable(request: TimetableRequest, db: Session = Depends(get_db)):
+    divisions = db.query(Division).filter(Division.department_id.in_(request.department_ids)).all()
+    subjects = db.query(Subject).filter(Subject.department_id.in_(request.department_ids)).all()
+    rooms = db.query(Room).all()
+    faculty = db.query(Faculty).filter(Faculty.department_id.in_(request.department_ids)).all()
+    timeslots = db.query(TimeSlot).all()
+    
+    input_data = {
+        'divisions': [{'id': d.id, 'name': d.name, 'student_count': d.student_count} for d in divisions],
+        'subjects': [{'id': s.id, 'name': s.name, 'hours_per_week': s.hours_per_week, 'is_lab': s.is_lab} for s in subjects],
+        'rooms': [{'id': r.id, 'room_number': r.room_number, 'capacity': r.capacity, 'is_lab': r.is_lab, 'floor': r.floor, 'bench_count': r.bench_count} for r in rooms],
+        'faculty': [{'id': f.id, 'name': f.name} for f in faculty],
+        'timeslots': [{'id': t.id, 'day': t.day, 'slot_number': t.slot_number} for t in timeslots],
+        'requirements': [
+            {
+                'division_id': d.id,
+                'subject_id': s.id,
+                'student_count': d.student_count,
+                'is_lab': s.is_lab
+            }
+            for d in divisions for s in subjects
+        ]
+    }
+    
+    orchestrator = AgentOrchestrator()
+    result = orchestrator.generate_timetable(input_data)
+    
+    return result
+
+@app.get("/")
+def root():
+    return {
+        "message": "University Timetable Management System API",
+        "status": "running",
+        "version": "1.0.0"
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
