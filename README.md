@@ -2,152 +2,176 @@
 
 An intelligent multi-agent AI system that automates university timetable generation using constraint programming, MCP protocol, and modern web technologies.
 
-## Overview
+## Features
 
-Universities face significant challenges in creating conflict-free timetables due to multiple classes, divisions, labs, limited rooms across different floors, faculty availability constraints, student group scheduling, lab vs classroom requirements, and capacity limitations.
+- Multi-agent AI system with 4 specialized agents
+- Natural language chatbot interface
+- Multi-step workflow with review and verification
+- Constraint-based scheduling using Google OR-Tools
+- Real-time agent communication logging
+- Export and approval functionality
+- Modern responsive UI
 
-This system solves these problems using Agentic AI with 4 specialized AI agents working collaboratively, MCP (Model Context Protocol) for standardized agent communication, A2A (Agent-to-Agent) coordination for intelligent problem-solving, constraint programming using Google OR-Tools, and a modern web UI.
+## Prerequisites
 
-## Key Features
-
-### Multi-Agent System
-- Constraint Agent: Validates scheduling rules and prevents conflicts
-- Optimization Agent: Uses OR-Tools CP-SAT solver for optimal scheduling
-- Conflict Resolution Agent: Intelligently resolves scheduling conflicts
-- Resource Allocation Agent: Manages rooms, labs, floors, and benches
-
-### Intelligent Scheduling
-- Prevents faculty double-booking
-- Avoids room conflicts
-- Ensures students aren't in two places at once
-- Matches lab subjects with lab rooms
-- Respects room capacity and bench counts
-- Optimizes floor allocation to minimize movement
-- Minimizes gaps in daily schedules
-
-### Modern Web Interface
-- Clean gradient UI with smooth animations
-- Tabbed data input for departments, subjects, rooms, faculty, divisions
-- Real-time validation and feedback
-- Interactive timetable visualization
-- Agent communication logs (A2A transparency)
-- Responsive design
-
-## Architecture
-
-```
-React Frontend (Modern UI with Tabbed Interface)
-    |
-    | REST API
-    v
-FastAPI Backend (API Endpoints & Orchestration)
-    |
-    v
-Agent Orchestrator (Coordinates Multi-Agent Workflow)
-    |
-    +-- Constraint Agent
-    +-- Optimization Agent
-    +-- Conflict Resolution Agent
-    +-- Resource Allocation Agent
-    |
-    v
-SQLite Database (Departments, Subjects, Rooms, Faculty, Divisions)
-```
-
-## Quick Start
-
-### Prerequisites
 - Python 3.10 or higher
 - Node.js 18 or higher
 - pip and npm
 
-### Installation
+## Quick Start
 
-**Backend Setup**
+### Automated Setup (Recommended)
+
+Run the setup script:
+
+```powershell
+.\setup.ps1
+```
+
+This will:
+1. Check prerequisites
+2. Install all dependencies
+3. Initialize database
+4. Start backend and frontend servers
+
+### Manual Setup
+
+#### Backend Setup
+
 ```bash
 cd backend
 pip install -r requirements.txt
 python seed_data.py
 python main.py
 ```
+
 Backend runs on http://localhost:8000
 
-**Frontend Setup (New Terminal)**
+#### Frontend Setup (New Terminal)
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
 Frontend runs on http://localhost:5173
 
-## Usage Guide
+## Usage
 
-1. Access the application at http://localhost:5173
-2. Use the tabbed interface to add your data:
-   - Departments: Name and Code
-   - Subjects: Name, Code, Hours per week, Lab flag
-   - Rooms: Room number, Floor, Capacity, Bench count, Lab flag
-   - Faculty: Name and Employee ID
-   - Divisions: Name, Year, Student count
-3. Click "Generate Timetable" button
-4. Review the generated timetable with metrics and agent logs
+1. Open http://localhost:5173 in your browser
+2. Add university data using the tabbed interface or chatbot
+3. Review and verify your data
+4. Generate timetable
+5. View results with metrics and agent logs
 
-## Technology Stack
+### Using the Chatbot
 
-### Backend
-- FastAPI: High-performance Python web framework
-- SQLAlchemy: SQL toolkit and ORM
-- OR-Tools: Google's constraint programming solver
-- Pydantic: Data validation
-- SQLite: Lightweight database
-
-### Frontend
-- React 18: Modern UI library
-- Vite: Next-generation build tool
-- CSS3: Gradients, animations, responsive design
-
-### AI & Agents
-- Custom Multi-Agent System
-- MCP Protocol: WebSocket-based agent communication
-- Constraint Programming: OR-Tools CP-SAT solver
+Click the chat button (💬) in the bottom-right corner and try:
+- "Add a new department"
+- "Generate timetable"
+- "Show all subjects"
+- "Help"
 
 ## Project Structure
 
 ```
 agentic_ai/
-├── agents/
+├── agents/              # AI agents
 │   ├── constraint_agent.py
 │   ├── optimization_agent.py
 │   ├── conflict_resolution_agent.py
 │   ├── resource_allocation_agent.py
 │   ├── orchestrator.py
-│   └── test_agents.py
-├── backend/
+│   └── chatbot_agent.py
+├── backend/             # FastAPI server
 │   ├── main.py
 │   ├── seed_data.py
 │   └── requirements.txt
-├── database/
+├── database/            # Database models
 │   ├── models.py
 │   └── database.py
-├── frontend/
+├── frontend/            # React application
 │   ├── src/
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── components/
-│   │       ├── DataInput.jsx
-│   │       └── TimetableView.jsx
-│   ├── index.html
 │   ├── package.json
 │   └── vite.config.js
-├── mcp_server/
-│   ├── server.py
-│   └── client.py
-├── config/
-│   └── config.py
-├── .gitignore
-├── .env.example
-└── README.md
+├── mcp_server/          # MCP protocol (optional)
+└── config/              # Configuration
 ```
+
+## Technology Stack
+
+### Backend
+- FastAPI - Web framework
+- SQLAlchemy - ORM
+- OR-Tools - Constraint solver
+- Pydantic - Data validation
+- SQLite - Database
+
+### Frontend
+- React 18 - UI library
+- Vite - Build tool
+- CSS3 - Styling
+
+### AI & Agents
+- Custom multi-agent system
+- MCP protocol
+- Natural language processing
+- Constraint programming
+
+## API Documentation
+
+Once backend is running, visit:
+http://localhost:8000/docs
+
+## Troubleshooting
+
+### Backend Issues
+
+**Port 8000 already in use:**
+```powershell
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+```
+
+**Module not found:**
+```bash
+pip install -r requirements.txt
+```
+
+### Frontend Issues
+
+**Port 5173 already in use:**
+```powershell
+netstat -ano | findstr :5173
+taskkill /PID <PID> /F
+```
+
+**Dependencies error:**
+```bash
+rm -r node_modules
+npm install
+```
+
+### Database Issues
+
+**Database locked:**
+```bash
+# Delete database and reinitialize
+rm backend/timetable.db
+python backend/seed_data.py
+```
+
+## Configuration
+
+Edit `config/config.py` to customize:
+- Maximum hours per day
+- Working days
+- Solver timeout
+- Constraint parameters
 
 ## Testing
 
@@ -157,73 +181,22 @@ cd agents
 python test_agents.py
 ```
 
-API documentation available at: http://localhost:8000/docs
+## Features by Branch
 
-## Configuration
+- `main` - Stable version with all features
+- `feature/enhanced-ui` - Multi-step workflow
+- `feature/chatbot-interface` - Natural language chatbot
 
-Edit `config/config.py` to customize:
-- Maximum hours per day
-- Working days
-- Lunch break slot
-- Solver timeout
-- Constraint parameters
+## Contributing
 
-## How It Works
-
-### Agent Workflow
-
-1. User Input: Frontend collects university data
-2. Data Validation: Backend validates and stores data
-3. Resource Allocation Agent: Matches rooms to requirements
-4. Optimization Agent: Generates optimal schedule using OR-Tools
-5. Constraint Agent: Validates all constraints
-6. Conflict Resolution Agent: Resolves any conflicts
-7. Results: Display timetable with metrics and logs
-
-### A2A Communication
-All agents communicate through the orchestrator, logging every interaction for transparency.
-
-## API Endpoints
-
-### Data Management
-- POST /departments/ - Create department
-- GET /departments/ - List all departments
-- POST /subjects/ - Create subject
-- GET /subjects/ - List all subjects
-- POST /rooms/ - Create room
-- GET /rooms/ - List all rooms
-- POST /faculty/ - Create faculty
-- GET /faculty/ - List all faculty
-- POST /divisions/ - Create division
-- GET /divisions/ - List all divisions
-
-### Timetable Generation
-- POST /generate-timetable/ - Generate timetable
-
-## Troubleshooting
-
-**Backend won't start**
-- Ensure Python 3.10+ is installed
-- Check if port 8000 is available
-- Verify all dependencies are installed
-
-**Frontend won't start**
-- Ensure Node.js 18+ is installed
-- Check if port 5173 is available
-- Try deleting node_modules and running npm install again
-
-**No timetable generated**
-- Ensure all data categories have at least one entry
-- Check constraint violations in the output
-- Verify timeslots are seeded
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## License
 
 MIT License
-
-## Contributing
-
-Contributions are welcome. Please submit a Pull Request.
 
 ## Acknowledgments
 
