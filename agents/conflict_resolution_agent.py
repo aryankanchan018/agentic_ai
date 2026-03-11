@@ -1,11 +1,26 @@
 from typing import List, Dict, Any
 import random
+from .base_agent import BaseAgent
 
-class ConflictResolutionAgent:
+class ConflictResolutionAgent(BaseAgent):
     """Agent responsible for resolving scheduling conflicts"""
     
     def __init__(self):
-        self.name = "ConflictResolutionAgent"
+        super().__init__("ConflictResolutionAgent")
+    
+    def get_capabilities(self) -> list:
+        return ['resolve_conflicts', 'suggest_alternatives', 'apply_resolution']
+    
+    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process conflict resolution request"""
+        method = request.get('method')
+        params = request.get('params', {})
+        
+        if method == 'resolve_conflicts':
+            result = self.resolve_conflicts(params.get('timetable', []), params.get('constraints', []))
+            return result
+        
+        return {'status': 'error', 'message': 'Unknown method'}
     
     def resolve_conflicts(self, timetable: List[Dict], constraints: List[Any]) -> Dict:
         """Attempt to resolve conflicts in timetable"""

@@ -1,10 +1,28 @@
 from typing import List, Dict, Any
+from .base_agent import BaseAgent
 
-class ResourceAllocationAgent:
+class ResourceAllocationAgent(BaseAgent):
     """Agent responsible for managing resource allocation"""
     
     def __init__(self):
-        self.name = "ResourceAllocationAgent"
+        super().__init__("ResourceAllocationAgent")
+    
+    def get_capabilities(self) -> list:
+        return ['allocate_rooms', 'optimize_floor_allocation', 'check_bench_availability']
+    
+    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process resource allocation request"""
+        method = request.get('method')
+        params = request.get('params', {})
+        
+        if method == 'allocate_rooms':
+            result = self.allocate_rooms(params.get('requirements', {}), params.get('rooms', []))
+            return result
+        elif method == 'optimize_floor_allocation':
+            result = self.optimize_floor_allocation(params.get('allocations', []), params.get('rooms', []))
+            return result
+        
+        return {'status': 'error', 'message': 'Unknown method'}
     
     def allocate_rooms(self, requirements: Dict, available_rooms: List[Dict]) -> Dict:
         """Allocate rooms based on requirements"""

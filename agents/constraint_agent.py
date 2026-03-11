@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 from dataclasses import dataclass
+from .base_agent import BaseAgent
 
 @dataclass
 class Constraint:
@@ -8,11 +9,11 @@ class Constraint:
     violated: bool
     details: str
 
-class ConstraintAgent:
+class ConstraintAgent(BaseAgent):
     """Agent responsible for validating timetable constraints"""
     
     def __init__(self):
-        self.name = "ConstraintAgent"
+        super().__init__("ConstraintAgent")
         self.constraints = []
     
     def check_room_capacity(self, room_capacity: int, student_count: int) -> Constraint:
@@ -74,6 +75,24 @@ class ConstraintAgent:
             violated=violated,
             details=f"Subject is lab: {subject_is_lab}, Room is lab: {room_is_lab}"
         )
+    
+    def get_capabilities(self) -> list:
+        return ['validate_constraints', 'check_capacity', 'check_overlaps']
+    
+    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process constraint validation request"""
+        method = request.get('method')
+        params = request.get('params', {})
+        
+        if method == 'validate_constraints':
+            constraints = self.validate_all(params)
+            return {
+                'status': 'validated',
+                'constraints': [{'type': c.type, 'violated': c.violated, 'details': c.details} for c in constraints],
+                'validated_by': self.agent_name
+            }
+        
+        return {'status': 'error', 'message': 'Unknown method'}
     
     def validate_all(self, timetable_data: Dict) -> List[Constraint]:
         """Run all constraint checks"""

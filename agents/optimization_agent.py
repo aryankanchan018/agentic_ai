@@ -3,13 +3,31 @@ from ortools.sat.python import cp_model
 import sys
 sys.path.append('..')
 from config.config import Config
+from .base_agent import BaseAgent
 
-class OptimizationAgent:
+class OptimizationAgent(BaseAgent):
     """Agent responsible for optimizing timetable efficiency"""
     
     def __init__(self):
-        self.name = "OptimizationAgent"
+        super().__init__("OptimizationAgent")
         self.config = Config()
+    
+    def get_capabilities(self) -> list:
+        return ['optimize_timetable', 'calculate_utilization', 'solve_constraints']
+    
+    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process optimization request"""
+        method = request.get('method')
+        params = request.get('params', {})
+        
+        if method == 'optimize_timetable':
+            result = self.optimize_timetable(params)
+            return result
+        elif method == 'calculate_utilization':
+            utilization = self.calculate_utilization(params.get('timetable', []))
+            return {'status': 'calculated', 'utilization': utilization, 'calculated_by': self.agent_name}
+        
+        return {'status': 'error', 'message': 'Unknown method'}
     
     def optimize_timetable(self, data: Dict) -> Dict:
         """Use constraint programming to generate optimal timetable"""

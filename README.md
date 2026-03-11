@@ -1,16 +1,43 @@
 # University Timetable Management System
 
-An intelligent multi-agent AI system that automates university timetable generation using constraint programming, MCP protocol, and modern web technologies.
+An intelligent **multi-agent AI system** that automates university timetable generation using **MCP (Model Context Protocol)**, **A2A (Agent-to-Agent) communication**, constraint programming, and modern web technologies.
 
 ## Features
 
-- Multi-agent AI system with 4 specialized agents
+- **8 Specialized AI Agents** with distinct responsibilities
+- **MCP Protocol** for standardized agent communication
+- **A2A Messaging** for distributed coordination
+- **Agent Registry** for service discovery and monitoring
+- **Real-time Analytics** and insights
+- **Performance Monitoring** and health checks
 - Natural language chatbot interface
-- Multi-step workflow with review and verification
 - Constraint-based scheduling using Google OR-Tools
-- Real-time agent communication logging
-- Export and approval functionality
 - Modern responsive UI
+
+## Multi-Agent Architecture
+
+### Agents
+
+1. **ValidationAgent** - Pre-flight data validation
+2. **ResourceAllocationAgent** - Room and resource management
+3. **OptimizationAgent** - Constraint programming solver
+4. **ConstraintAgent** - Constraint validation
+5. **ConflictResolutionAgent** - Conflict resolution strategies
+6. **MonitoringAgent** - Performance tracking and health monitoring
+7. **AnalyticsAgent** - Insights and recommendations
+8. **ChatbotAgent** - Natural language interface
+
+### Communication Flow
+
+```
+Orchestrator → ValidationAgent → ResourceAllocationAgent → 
+OptimizationAgent → ConstraintAgent → ConflictResolutionAgent → 
+AnalyticsAgent → MonitoringAgent
+```
+
+All communication is logged via **Agent Registry** for complete observability.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed documentation.
 
 ## Prerequisites
 
@@ -77,29 +104,41 @@ Click the chat button (💬) in the bottom-right corner and try:
 
 ```
 agentic_ai/
-├── agents/              # AI agents
-│   ├── constraint_agent.py
-│   ├── optimization_agent.py
-│   ├── conflict_resolution_agent.py
-│   ├── resource_allocation_agent.py
-│   ├── orchestrator.py
-│   └── chatbot_agent.py
-├── backend/             # FastAPI server
+├── agents/                    # AI Agents (8 specialized agents)
+│   ├── base_agent.py         # Base agent class with MCP support
+│   ├── agent_registry.py     # Service discovery and logging
+│   ├── validation_agent.py   # Data validation
+│   ├── resource_allocation_agent.py  # Resource management
+│   ├── optimization_agent.py # Constraint solver
+│   ├── constraint_agent.py   # Constraint validation
+│   ├── conflict_resolution_agent.py  # Conflict resolution
+│   ├── monitoring_agent.py   # Performance monitoring
+│   ├── analytics_agent.py    # Insights and recommendations
+│   ├── chatbot_agent.py      # Natural language interface
+│   ├── orchestrator.py       # Agent coordination
+│   └── test_enhanced_agents.py  # Comprehensive tests
+├── backend/                   # FastAPI server
 │   ├── main.py
 │   ├── seed_data.py
 │   └── requirements.txt
-├── database/            # Database models
+├── database/                  # Database models
 │   ├── models.py
 │   └── database.py
-├── frontend/            # React application
+├── frontend/                  # React application
 │   ├── src/
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── components/
 │   ├── package.json
 │   └── vite.config.js
-├── mcp_server/          # MCP protocol (optional)
-└── config/              # Configuration
+├── mcp_server/                # MCP protocol implementation
+│   ├── server.py             # Basic MCP server
+│   ├── enhanced_server.py    # Enhanced MCP with registry
+│   └── client.py             # MCP client
+├── config/                    # Configuration
+│   └── config.py
+├── ARCHITECTURE.md            # Detailed architecture docs
+└── README.md
 ```
 
 ## Technology Stack
@@ -175,11 +214,41 @@ Edit `config/config.py` to customize:
 
 ## Testing
 
-Test the agent system:
+Test the enhanced multi-agent system:
 ```bash
 cd agents
-python test_agents.py
+python test_enhanced_agents.py
 ```
+
+This will test:
+- All 8 agents individually
+- Agent Registry
+- Full orchestration workflow
+- A2A communication
+- Performance monitoring
+- Analytics and insights
+
+## MCP Server (Optional)
+
+To enable MCP-based agent communication:
+
+```bash
+# Terminal 1: Start MCP Server
+python mcp_server/enhanced_server.py
+
+# Terminal 2: Start Backend with MCP enabled
+# Agents will automatically connect to MCP server
+python backend/main.py
+```
+
+## Agent Communication
+
+The system supports two modes:
+
+1. **Direct Mode** (Default): Agents communicate via direct function calls
+2. **MCP Mode**: Agents communicate via WebSocket-based MCP protocol
+
+Both modes provide complete message logging and observability.
 
 ## Features by Branch
 
